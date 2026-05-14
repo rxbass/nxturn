@@ -727,4 +727,7 @@ Great work today, Dr. ${clinic?.doctor_name?.replace('Dr. ', '') || 'Doctor'}!`
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
-app.listen(3001, () => console.log('✓ API server → http://localhost:3001'))
+app.get('/api/health', (_, res) => res.json({ status: 'ok' }))
+
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => console.log(`✓ API server → http://localhost:${PORT}`))
