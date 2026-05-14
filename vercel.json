@@ -1,6 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/marketing.html", "destination": "/marketing.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "^/$", "dest": "/marketing.html" },
+    { "src": "^/marketing\\.html$", "dest": "/marketing.html" },
+    { "src": "^/(assets|favicon.*)(.*)", "dest": "/$1$2" },
+    { "src": "^/(.*)", "dest": "/index.html" }
   ]
 }
