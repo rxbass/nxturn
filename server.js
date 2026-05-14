@@ -56,17 +56,22 @@ app.post('/api/register', async (req, res) => {
       event_type: 'registered',
     })
 
-    // Run AI prediction immediately — saves eta_turn to all waiting patients
-    const predictions = await runQueuePrediction(clinic_id, new Date())
+    // Return token immediately — don't wait for AI or WhatsApp
+    res.json({ token_number, patient_id: patient.id })
 
-    const { data: clinic } = await supabase.from('clinics').select('name').eq('id', clinic_id).single()
-    const statusUrl = `${APP_URL}/status/${token_number}`
+    // Run AI prediction + WhatsApp in background (non-blocking)
+    setImmediate(async () => {
+      try {
+        const [predictions, { data: clinic }] = await Promise.all([
+          runQueuePrediction(clinic_id, new Date()),
+          supabase.from('clinics').select('name').eq('id', clinic_id).single(),
+        ])
 
-    // Find this patient's prediction
-    const myPred = predictions.find((p) => p.patient_id === patient.id)
-    const timeHint = myPred?.eta_turn ? `\nYour estimated turn: ${myPred.eta_turn}` : ''
+        const statusUrl = `${APP_URL}/status/${token_number}`
+        const myPred = predictions.find((p) => p.patient_id === patient.id) || predictions[0]
+        const timeHint = myPred?.eta_turn ? `\nYour estimated turn: ${myPred.eta_turn}` : ''
 
-    const msg = `Hi ${name}! You're registered at ${clinic?.name || 'the clinic'}.
+        const msg = `Hi ${name}! You're registered at ${clinic?.name || 'the clinic'}.
 
 Token number: *#${token_number}*${timeHint}
 
@@ -75,9 +80,11 @@ ${statusUrl}
 
 We'll message you when it's your turn 🏥`
 
-    if (has_whatsapp) await sendWhatsApp(phone, msg)
-
-    res.json({ token_number, patient_id: patient.id })
+        if (has_whatsapp) await sendWhatsApp(phone, msg)
+      } catch (err) {
+        console.error('Background registration task failed:', err.message)
+      }
+    })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
