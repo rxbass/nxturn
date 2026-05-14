@@ -173,6 +173,75 @@
   .footer-contact a { color: #5eead4; text-decoration: none; font-weight: 600; font-size: 15px; }
   .footer-contact p { color: #475569; font-size: 13px; margin-top: 4px; }
 
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    /* Global */
+    section { padding: 48px 20px; }
+    h2 { font-size: 28px; }
+    .lead { font-size: 15px; }
+    .container { padding: 0; }
+
+    /* Nav */
+    nav .max-w-6xl { padding: 0 16px; }
+    nav div:nth-child(2) { display: none; }
+
+    /* Hero */
+    .hero { padding: 80px 20px 60px; }
+    .hero h1 { font-size: 36px; }
+    .hero p { font-size: 16px; }
+    .hero-btns { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-outline { width: 100%; max-width: 300px; text-align: center; }
+
+    /* Mock UI */
+    .mock-wrap { padding: 0 16px; margin-top: -24px; }
+    .mock-body { grid-template-columns: 1fr; }
+    .mock-panel { display: none; }
+
+    /* Problem */
+    .problem-grid { grid-template-columns: 1fr; }
+
+    /* How it works */
+    .steps { grid-template-columns: 1fr; gap: 40px; }
+    .steps::before { display: none; }
+
+    /* Features */
+    .feat-grid { grid-template-columns: 1fr; gap: 32px; }
+
+    /* AI */
+    .ai-grid { grid-template-columns: 1fr; }
+
+    /* Testimonials */
+    .testi-grid { grid-template-columns: 1fr; }
+
+    /* Who it's for */
+    .india-grid { grid-template-columns: 1fr; }
+    .pilot-grid { grid-template-columns: 1fr; }
+
+    /* Pricing */
+    .pricing-grid { grid-template-columns: 1fr; }
+    .price-card.featured { order: -1; }
+
+    /* Quick access */
+    .quick-grid { grid-template-columns: 1fr !important; }
+
+    /* Footer */
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-contact { text-align: center; }
+
+    /* Pilot CTA */
+    .pilot-cta { font-size: 15px; padding: 14px 24px; }
+    .pilot h2 { font-size: 30px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 28px; }
+    h2 { font-size: 24px; }
+    .problem-stat { font-size: 36px; }
+    .price-amount { font-size: 36px; }
+    .mock-wrap { display: none; }
+    .hero { padding-bottom: 40px; }
+  }
+
   /* ── Print ── */
   @media print {
     .hero { padding: 48px 24px 60px; }
@@ -546,7 +615,7 @@
       <h2>Access the <em>app directly</em></h2>
       <p class="lead" style="margin-top:12px;">Open any page instantly — no login needed for the demo.</p>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px; max-width:800px; margin:0 auto;">
+    <div class="quick-grid" style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px; max-width:800px; margin:0 auto;">
 
       <a href="/receptionist" style="text-decoration:none;">
         <div style="background:#fff; border:2px solid #ccfbf1; border-radius:20px; padding:28px; transition:all 0.2s; cursor:pointer;" onmouseover="this.style.borderColor='#0d9488';this.style.boxShadow='0 8px 24px rgba(13,148,136,0.15)'" onmouseout="this.style.borderColor='#ccfbf1';this.style.boxShadow='none'">
