@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
+import ws from 'ws'
 
 dotenv.config({ path: './supabase/functions/.env' })
 
@@ -14,7 +15,9 @@ const {
   APP_URL = 'http://localhost:5173',
 } = process.env
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  realtime: { transport: ws },
+})
 const app = express()
 
 function fmtTime24(t) {
