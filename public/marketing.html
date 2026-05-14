@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nxturn — AI-Powered Clinic Queue Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #0f172a; background: #fff; line-height: 1.6; }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+    padding: 80px 40px 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(255,255,255,0.15), transparent 60%);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.2); color: #fff;
+    padding: 6px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; margin-bottom: 28px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .hero-badge span { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; }
+  .hero h1 { font-size: 56px; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 20px; position: relative; }
+  .hero h1 em { font-style: normal; color: #99f6e4; }
+  .hero p { font-size: 20px; color: rgba(255,255,255,0.85); max-width: 600px; margin: 0 auto 40px; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
+  .btn-primary { background: #fff; color: #0d9488; font-weight: 700; font-size: 16px; padding: 14px 32px; border-radius: 14px; text-decoration: none; display: inline-block; }
+  .btn-outline { border: 2px solid rgba(255,255,255,0.5); color: #fff; font-weight: 600; font-size: 16px; padding: 14px 32px; border-radius: 14px; text-decoration: none; display: inline-block; }
+
+  /* ── Mock UI ── */
+  .mock-wrap { max-width: 900px; margin: -40px auto 0; padding: 0 40px; position: relative; z-index: 10; }
+  .mock-ui {
+    background: #fff; border-radius: 24px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.2);
+    overflow: hidden; border: 1px solid #e2e8f0;
+  }
+  .mock-bar { background: linear-gradient(135deg, #0d9488, #0284c7); padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+  .mock-dots { display: flex; gap: 6px; }
+  .mock-dots span { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .mock-url { flex: 1; background: rgba(255,255,255,0.2); border-radius: 8px; padding: 6px 14px; color: rgba(255,255,255,0.9); font-size: 13px; }
+  .mock-body { padding: 24px; display: grid; grid-template-columns: 1fr 280px; gap: 20px; }
+  .mock-queue { display: flex; flex-direction: column; gap: 10px; }
+  .mock-row { padding: 12px 16px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .mock-row.now { background: #ecfdf5; border: 1px solid #bbf7d0; }
+  .mock-row.next { background: #fffbeb; border: 1px solid #fde68a; }
+  .mock-row.wait { background: #f0fdfa; border: 1px solid #ccfbf1; }
+  .mock-name { font-weight: 700; font-size: 14px; color: #1e293b; }
+  .mock-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .mock-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .badge-now { background: #22c55e; color: #fff; }
+  .badge-next { background: #f59e0b; color: #fff; }
+  .badge-wait { background: #0d9488; color: #fff; }
+  .mock-panel { background: #f0fdfa; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #ccfbf1; }
+  .mock-wa { background: #fff; border-radius: 12px; padding: 12px; font-size: 12px; color: #374151; line-height: 1.5; border: 1px solid #e2e8f0; }
+  .mock-wa-label { font-size: 11px; font-weight: 600; color: #0d9488; margin-bottom: 6px; display: flex; align-items: center; gap-6px; }
+  .mock-btn { background: linear-gradient(135deg, #0d9488, #0284c7); color: #fff; text-align: center; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 13px; }
+
+  /* ── Sections ── */
+  section { padding: 80px 40px; }
+  .container { max-width: 960px; margin: 0 auto; }
+  .section-label { font-size: 12px; font-weight: 700; color: #0d9488; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  h2 { font-size: 40px; font-weight: 900; color: #0f172a; line-height: 1.15; margin-bottom: 16px; }
+  h2 em { font-style: normal; color: #0d9488; }
+  .lead { font-size: 18px; color: #475569; max-width: 600px; }
+
+  /* ── Problem ── */
+  .problem { background: #fff7ed; }
+  .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .problem-card { background: #fff; border: 1px solid #fed7aa; border-radius: 20px; padding: 28px; text-align: center; }
+  .problem-stat { font-size: 44px; font-weight: 900; color: #ea580c; margin-bottom: 8px; }
+  .problem-card p { font-size: 14px; color: #64748b; }
+  .problem-emoji { font-size: 32px; margin-bottom: 12px; }
+
+  /* ── How it works ── */
+  .how { background: #f0fdfa; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; position: relative; }
+  .steps::before { content: ''; position: absolute; top: 36px; left: calc(33.33% - 10px); right: calc(33.33% - 10px); height: 2px; background: #99f6e4; }
+  .step { text-align: center; position: relative; }
+  .step-num { width: 72px; height: 72px; background: linear-gradient(135deg, #0d9488, #0284c7); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(13,148,136,0.3); position: relative; }
+  .step-badge { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #fff; border: 2px solid #0d9488; border-radius: 50%; font-size: 11px; font-weight: 900; color: #0d9488; display: flex; align-items: center; justify-content: center; }
+  .step h3 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: #475569; }
+
+  /* ── Features ── */
+  .features { background: #fff; }
+  .feat-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 48px; margin-bottom: 2px; }
+  .feat-tab { background: #f8fafc; padding: 16px; text-align: center; font-size: 13px; font-weight: 600; color: #64748b; border-radius: 14px 14px 0 0; }
+  .feat-tab.active { background: #f0fdfa; color: #0d9488; border-bottom: 2px solid #0d9488; }
+  .feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; margin-top: 48px; }
+  .feat-col h3 { font-size: 16px; font-weight: 700; color: #0d9488; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0fdfa; display: flex; align-items: center; gap: 8px; }
+  .feat-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .feat-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #334155; }
+  .feat-list li::before { content: '✓'; color: #0d9488; font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+
+  /* ── AI section ── */
+  .ai-section { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); color: #fff; }
+  .ai-section h2 { color: #fff; }
+  .ai-section .lead { color: rgba(255,255,255,0.7); }
+  .ai-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+  .ai-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; }
+  .ai-card h4 { font-size: 15px; font-weight: 700; color: #5eead4; margin-bottom: 8px; }
+  .ai-card p { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+  .ai-badge { display: inline-block; background: rgba(94,234,212,0.15); color: #5eead4; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; border: 1px solid rgba(94,234,212,0.3); }
+
+  /* ── Testimonials ── */
+  .testimonials { background: #f8fafc; }
+  .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .testi-card { background: #fff; border-radius: 20px; padding: 28px; border: 1px solid #e2e8f0; position: relative; }
+  .testi-card::before { content: '"'; font-size: 64px; color: #ccfbf1; font-weight: 900; line-height: 1; position: absolute; top: 16px; left: 24px; font-family: Georgia, serif; }
+  .testi-text { font-size: 14px; color: #374151; line-height: 1.7; margin-top: 32px; font-style: italic; }
+  .testi-author { margin-top: 16px; font-size: 13px; font-weight: 600; color: #0d9488; }
+  .testi-role { font-size: 12px; color: #94a3b8; font-weight: 400; }
+
+  /* ── Pricing ── */
+  .pricing { background: #fff; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .price-card { border: 2px solid #e2e8f0; border-radius: 24px; padding: 32px; }
+  .price-card.featured { background: linear-gradient(135deg, #0d9488, #0284c7); border-color: transparent; }
+  .price-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+  .price-name { font-size: 24px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+  .price-card.featured .price-name { color: #fff; }
+  .price-amount { font-size: 44px; font-weight: 900; color: #0f172a; line-height: 1; }
+  .price-card.featured .price-amount { color: #fff; }
+  .price-period { font-size: 14px; color: #64748b; }
+  .price-card.featured .price-period { color: rgba(255,255,255,0.7); }
+  .price-desc { font-size: 13px; color: #64748b; margin: 12px 0 24px; }
+  .price-card.featured .price-desc { color: rgba(255,255,255,0.7); }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .price-features li { font-size: 13px; color: #374151; display: flex; align-items: center; gap: 8px; }
+  .price-card.featured .price-features li { color: rgba(255,255,255,0.9); }
+  .price-features li::before { content: '✓'; font-weight: 700; color: #0d9488; flex-shrink: 0; }
+  .price-card.featured .price-features li::before { color: #a7f3d0; }
+  .price-btn { display: block; text-align: center; padding: 13px; border-radius: 14px; font-weight: 700; font-size: 14px; text-decoration: none; }
+  .price-btn-outline { border: 2px solid #0d9488; color: #0d9488; }
+  .price-btn-white { background: #fff; color: #0d9488; }
+
+  /* ── Pilot ── */
+  .pilot { background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%); color: #fff; text-align: center; }
+  .pilot h2 { color: #fff; font-size: 44px; }
+  .pilot .lead { color: rgba(255,255,255,0.8); margin: 0 auto 48px; }
+  .pilot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px; }
+  .pilot-item { background: rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.2); }
+  .pilot-item h4 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .pilot-item p { font-size: 13px; color: rgba(255,255,255,0.75); }
+  .pilot-cta { display: inline-flex; align-items: center; gap: 12px; background: #fff; color: #0d9488; font-weight: 800; font-size: 18px; padding: 18px 40px; border-radius: 16px; text-decoration: none; }
+
+  /* ── Why India ── */
+  .india { background: #f0fdfa; }
+  .india-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+  .india-card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #ccfbf1; }
+  .india-icon { font-size: 32px; margin-bottom: 12px; }
+  .india-card h4 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .india-card p { font-size: 13px; color: #475569; line-height: 1.6; }
+
+  /* ── Footer ── */
+  footer { background: #0f172a; color: #fff; padding: 48px 40px; }
+  .footer-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+  .footer-logo { font-size: 24px; font-weight: 900; color: #fff; }
+  .footer-logo span { color: #5eead4; }
+  .footer-tagline { font-size: 13px; color: #64748b; margin-top: 4px; }
+  .footer-contact { text-align: right; }
+  .footer-contact a { color: #5eead4; text-decoration: none; font-weight: 600; font-size: 15px; }
+  .footer-contact p { color: #475569; font-size: 13px; margin-top: 4px; }
+
+  /* ── Print ── */
+  @media print {
+    .hero { padding: 48px 24px 60px; }
+    .hero h1 { font-size: 36px; }
+    section { padding: 48px 24px; }
+    h2 { font-size: 28px; }
+    .mock-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge"><span></span> AI-Powered · Built for India · WhatsApp-First</div>
+  <h1>No more patients<br/><em>waiting in the dark</em></h1>
+  <p>Nxturn tells your patients exactly when to arrive — so your waiting room stays empty and your clinic runs on time.</p>
+  <div class="hero-btns">
+    <a href="#pilot" class="btn-primary">Get started free →</a>
+    <a href="#how" class="btn-outline">See how it works</a>
+  </div>
+</section>
+
+<!-- ── MOCK UI ── -->
+<div class="mock-wrap">
+  <div class="mock-ui">
+    <div class="mock-bar">
+      <div class="mock-dots"><span></span><span></span><span></span></div>
+      <div class="mock-url">nxturn.app/receptionist</div>
+    </div>
+    <div class="mock-body">
+      <div class="mock-queue">
+        <div class="mock-row now">
+          <div><div class="mock-name">#6 Sunita Rao — Follow-up</div><div class="mock-sub">Body pain, Fever · 10m away</div></div>
+          <span class="mock-badge badge-now">With Doctor</span>
+        </div>
+        <div class="mock-row next">
+          <div><div class="mock-name">#7 Vikram Singh — New Patient</div><div class="mock-sub">Chest pain · 20m away · Referred</div></div>
+          <span class="mock-badge badge-next">Get Ready</span>
+        </div>
+        <div class="mock-row wait">
+          <div><div class="mock-name">#8 Anitha Menon — Follow-up</div><div class="mock-sub">Headache, Dizziness · 15m away</div></div>
+          <span class="mock-badge badge-wait">~6:20pm</span>
+        </div>
+        <div class="mock-row wait">
+          <div><div class="mock-name">#9 Suresh Babu — New Patient</div><div class="mock-sub">Skin rash, Fever · 35m away</div></div>
+          <span class="mock-badge badge-wait">~6:35pm</span>
+        </div>
+      </div>
+      <div class="mock-panel">
+        <div>
+          <div class="mock-wa-label">💬 WhatsApp sent to #7</div>
+          <div class="mock-wa">Hi Vikram! Your turn is at <strong>5:55pm</strong> 🏥<br/>Head to City Clinic now.<br/><br/>Reply: 1️⃣ On my way · 2️⃣ Need more time</div>
+        </div>
+        <div class="mock-btn">✓ Mark as Seen → Next</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROBLEM ── -->
+<section class="problem" style="margin-top: 80px;">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2>Waiting rooms are broken — <em>for everyone</em></h2>
+    <p class="lead">Sick patients sit for hours. Receptionists manage complaints. Doctors rush. Nobody wins.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-emoji">⏱️</div>
+        <div class="problem-stat">2.5 hrs</div>
+        <p>Average wait time in Indian OPDs — for patients who should be resting at home</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-emoji">🚶</div>
+        <div class="problem-stat">40%</div>
+        <p>Patients who leave without being seen — too sick to wait, too frustrated to stay</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-emoji">📞</div>
+        <div class="problem-stat">30+</div>
+        <p>Times a receptionist is asked "how long?" every day — time stolen from actual work</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2>Three steps. <em>Zero waiting rooms.</em></h2>
+    <p class="lead">No app download. No login. Works on any phone. Your receptionist does exactly what they do today — just smarter.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">📋<div class="step-badge">1</div></div>
+        <h3>Receptionist registers</h3>
+        <p>Name, phone, symptoms — 30 seconds. Patient gets a WhatsApp instantly with their token and a live tracking link.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">🤖<div class="step-badge">2</div></div>
+        <h3>AI predicts the queue</h3>
+        <p>Every tap of "Mark as Seen" feeds the AI. It learns your doctor's pace and calculates exactly when each patient will be called.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">📱<div class="step-badge">3</div></div>
+        <h3>Patient arrives on time</h3>
+        <p>WhatsApp alert: "Your turn is at 6:20pm — head to clinic now." Patient arrives on time. No waiting. No guessing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>Everything your clinic needs, <em>nothing it doesn't</em></h2>
+    <div class="feat-grid">
+      <div class="feat-col">
+        <h3>👩‍💼 For the Receptionist</h3>
+        <ul class="feat-list">
+          <li>Register a patient in under 30 seconds</li>
+          <li>One tap to move to the next patient</li>
+          <li>Doctor delay button — all patients notified automatically</li>
+          <li>Priority queue for elderly, emergencies, pregnant patients</li>
+          <li>Returning patient auto-fill by phone number</li>
+          <li>Pause queue for doctor breaks</li>
+          <li>Full patient list with live status</li>
+          <li>Doctor absent — bulk cancel with WhatsApp to all</li>
+        </ul>
+      </div>
+      <div class="feat-col">
+        <h3>📱 For the Patient</h3>
+        <ul class="feat-list">
+          <li>WhatsApp confirmation on registration</li>
+          <li>Live status page — no app needed</li>
+          <li>Exact turn time prediction</li>
+          <li>Doctor delay alerts in real time</li>
+          <li>Self-cancel from their phone</li>
+          <li>Reply "On my way" or "Need more time"</li>
+          <li>Works on any browser, any phone</li>
+          <li>Token display for patients without smartphones</li>
+        </ul>
+      </div>
+      <div class="feat-col">
+        <h3>👨‍⚕️ For the Doctor</h3>
+        <ul class="feat-list">
+          <li>Analytics dashboard — daily / weekly / monthly</li>
+          <li>Avg consultation time per case type</li>
+          <li>Top symptoms and duration trends</li>
+          <li>No-show rate and patient feedback scores</li>
+          <li>End-of-day WhatsApp summary</li>
+          <li>Export full patient data to CSV</li>
+          <li>Session pace by time of day</li>
+          <li>Busiest days of the week</li>
+        </ul>
+      </div>
+      <div class="feat-col">
+        <h3>🏥 For the Clinic</h3>
+        <ul class="feat-list">
+          <li>Token display screen for clinic TV or tablet</li>
+          <li>Auto queue reset at midnight every day</li>
+          <li>Visiting hours enforcement — no actions outside hours</li>
+          <li>SMS fallback for patients without WhatsApp</li>
+          <li>Historical data improves AI predictions automatically</li>
+          <li>No installation — runs in any browser</li>
+          <li>Works offline for display screen</li>
+          <li>Secure, Indian-compliant data storage</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AI ── -->
+<section class="ai-section">
+  <div class="container">
+    <div class="section-label" style="color: #5eead4;">The AI Engine</div>
+    <h2>Gets smarter <em style="color: #5eead4;">every single day</em></h2>
+    <p class="lead">The more patients your clinic sees, the more accurate Nxturn's predictions become. No retraining. No configuration. Just better results over time.</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-badge">Day-of-week patterns</div>
+        <h4>Mondays are slower — it knows</h4>
+        <p>The AI tracks your doctor's actual pace per weekday and adjusts predictions accordingly. Wednesday afternoons look different from Friday evenings.</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-badge">Symptom complexity</div>
+        <h4>Chest pain takes 18 mins. Cold takes 7.</h4>
+        <p>By tracking actual consultation durations per symptom, the AI learns which cases are quick and which need extra time — before the patient walks in.</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-badge">No-show detection</div>
+        <h4>Flags patients likely to skip</h4>
+        <p>Patients who have missed appointments before are flagged automatically. The AI accounts for this when calculating turn times for others.</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-badge">Time-of-day pace</div>
+        <h4>Post-lunch doctor is 20% faster</h4>
+        <p>Morning, afternoon, and evening sessions have different rhythms. The AI tracks each separately and uses the right baseline for every prediction.</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-badge">Priority routing</div>
+        <h4>Elderly? Pregnant? Emergency? Front of queue.</h4>
+        <p>Priority patients are flagged at registration and automatically moved to the front. The AI recalculates everyone else's time instantly.</p>
+      </div>
+      <div class="ai-card">
+        <div class="ai-badge">Delay handling</div>
+        <h4>Doctor 30 mins late? Everyone adjusted.</h4>
+        <p>One tap logs the delay. The AI recalculates every waiting patient's turn time and sends them an updated WhatsApp — automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-label">Patient Experience</div>
+    <h2>What patients <em>actually say</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <p class="testi-text">I got a WhatsApp at 5:45pm telling me to leave home. I reached at 6:05pm and was called in at 6:10pm. No waiting in that crowded room.</p>
+        <div class="testi-author">Ramesh, 58 <span class="testi-role">— Patient, Chennai</span></div>
+      </div>
+      <div class="testi-card">
+        <p class="testi-text">My mother is diabetic and can't stand for long. Being able to wait at home and come only when it's her turn made such a difference.</p>
+        <div class="testi-author">Kavitha, 34 <span class="testi-role">— Caregiver, Coimbatore</span></div>
+      </div>
+      <div class="testi-card">
+        <p class="testi-text">The clinic feels so much more organised now. I actually trust the system. I know my time is respected — not wasted.</p>
+        <div class="testi-author">Arun, 42 <span class="testi-role">— Patient, Hyderabad</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY INDIA ── -->
+<section class="india">
+  <div class="container">
+    <div class="section-label">Built for India</div>
+    <h2>Designed for how <em>Indian clinics actually work</em></h2>
+    <div class="india-grid">
+      <div class="india-card">
+        <div class="india-icon">📱</div>
+        <h4>WhatsApp-first</h4>
+        <p>Every notification goes via WhatsApp — where your patients already are. No app download. No email. Just a message they'll actually read.</p>
+      </div>
+      <div class="india-card">
+        <div class="india-icon">🔌</div>
+        <h4>Zero installation</h4>
+        <p>Your receptionist opens a browser. That's it. Works on any laptop, tablet, or phone. No IT department needed.</p>
+      </div>
+      <div class="india-card">
+        <div class="india-icon">🧑‍🦽</div>
+        <h4>No smartphone? No problem.</h4>
+        <p>The clinic display screen shows the current token number on your waiting room TV. Every patient type is covered.</p>
+      </div>
+      <div class="india-card">
+        <div class="india-icon">🔐</div>
+        <h4>Your data, your control</h4>
+        <p>Patient data is stored securely and never shared. Export everything to CSV anytime. No lock-in.</p>
+      </div>
+      <div class="india-card">
+        <div class="india-icon">💰</div>
+        <h4>Priced for India</h4>
+        <p>₹999/month for the full experience. That's ₹25/day — less than a cup of coffee — for a clinic that runs 40 patients.</p>
+      </div>
+      <div class="india-card">
+        <div class="india-icon">🤝</div>
+        <h4>Real support</h4>
+        <p>Not a ticketing system. A WhatsApp number you can message. We come to you for setup. We stay available during your clinic hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-label">Pricing</div>
+    <h2>Simple pricing. <em>No surprises.</em></h2>
+    <p class="lead">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div style="display: flex; align-items: flex-end; gap: 4px; margin: 12px 0 4px;">
+          <div class="price-amount">₹0</div>
+          <div class="price-period">/month forever</div>
+        </div>
+        <div class="price-desc">Perfect for clinics getting started</div>
+        <ul class="price-features">
+          <li>AI queue prediction</li>
+          <li>Patient status page</li>
+          <li>Clinic display screen</li>
+          <li>Basic analytics</li>
+          <li>1 doctor</li>
+          <li>Unlimited patients</li>
+        </ul>
+        <a href="#pilot" class="price-btn price-btn-outline">Get started free</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Most Popular</div>
+        <div class="price-name">Pro</div>
+        <div style="display: flex; align-items: flex-end; gap: 4px; margin: 12px 0 4px;">
+          <div class="price-amount">₹999</div>
+          <div class="price-period">/month</div>
+        </div>
+        <div class="price-desc">For active clinics wanting full experience</div>
+        <ul class="price-features">
+          <li>Everything in Free</li>
+          <li>WhatsApp notifications</li>
+          <li>Doctor delay alerts</li>
+          <li>Full analytics + CSV export</li>
+          <li>Multi-doctor support</li>
+          <li>Patient feedback</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#pilot" class="price-btn price-btn-white">Start 3-month free trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Premium</div>
+        <div style="display: flex; align-items: flex-end; gap: 4px; margin: 12px 0 4px;">
+          <div class="price-amount">₹2,499</div>
+          <div class="price-period">/month</div>
+        </div>
+        <div class="price-desc">For serious multi-doctor clinics</div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>Custom WhatsApp messages</li>
+          <li>SMS fallback (MSG91)</li>
+          <li>API access</li>
+          <li>Multi-clinic management</li>
+          <li>Dedicated support</li>
+        </ul>
+        <a href="mailto:hello@nxturn.app" class="price-btn price-btn-outline">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PILOT ── -->
+<section class="pilot" id="pilot">
+  <div class="container">
+    <div class="section-label" style="color: rgba(255,255,255,0.7);">Limited Offer</div>
+    <h2>Free 3-month pilot for<br/>early clinics</h2>
+    <p class="lead">We are looking for 5 clinics in your city to run a completely free pilot. Full Pro plan. Personal setup. Direct support.</p>
+    <div class="pilot-grid">
+      <div class="pilot-item">
+        <h4>What you get</h4>
+        <p>Full Pro plan free for 3 months · Personal setup at your clinic · Direct WhatsApp support during clinic hours</p>
+      </div>
+      <div class="pilot-item">
+        <h4>What we ask</h4>
+        <p>Use it every day for 3 months · Weekly feedback (5 minutes) · Let us share anonymised results as a case study</p>
+      </div>
+      <div class="pilot-item">
+        <h4>How to apply</h4>
+        <p>WhatsApp us or email hello@nxturn.app — we'll set you up within 24 hours. No paperwork. No contract.</p>
+      </div>
+    </div>
+    <a href="mailto:hello@nxturn.app" class="pilot-cta">Apply for the pilot →</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Nxt<span>urn</span></div>
+      <div class="footer-tagline">No more waiting rooms. Built for India. 🇮🇳</div>
+    </div>
+    <div class="footer-contact">
+      <a href="mailto:hello@nxturn.app">hello@nxturn.app</a>
+      <p>WhatsApp: +91 XXXXX XXXXX</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

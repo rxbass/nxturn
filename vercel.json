@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/marketing.html", "destination": "/marketing.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #f0fdfa;
+    color: #0f172a;
+  }
+  p, span, label, td, th, li {
+    color: inherit;
+  }
+}
+
+@layer components {
+  .btn-brand {
+    @apply bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold rounded-2xl transition-colors;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-brand-100 shadow-sm;
+  }
+  .input-base {
+    @apply border border-brand-200 rounded-xl px-4 py-3 text-brand-900 placeholder-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white text-sm;
+  }
+}

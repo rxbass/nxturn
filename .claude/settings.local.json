@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force })",
+      "PowerShell(netstat -ano)",
+      "PowerShell(supabase --version 2>&1)",
+      "PowerShell(scoop --version 2>&1)",
+      "PowerShell(winget --version 2>&1)",
+      "PowerShell(winget install Supabase.CLI 2>&1)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://github.com/supabase/cli/releases/latest/download/supabase_windows_amd64.tar.gz\" -OutFile \"$env:TEMP\\\\supabase.tar.gz\" 2>&1 | Select-Object -Last 5)",
+      "PowerShell(tar -xzf \"$env:TEMP\\\\supabase.tar.gz\" -C \"$env:TEMP\" 2>&1; Move-Item \"$env:TEMP\\\\supabase.exe\" \"d:\\\\ai\\\\nxturn\\\\supabase.exe\" -Force 2>&1; .\\\\supabase.exe --version)",
+      "PowerShell($pid = \\(Get-NetTCPConnection -LocalPort 3001 -State Listen -ErrorAction SilentlyContinue\\).OwningProcess | Select-Object -First 1; if \\($pid\\) { Stop-Process -Id $pid -Force; \"Killed PID $pid\" } else { \"Port 3001 already free\" })",
+      "PowerShell($p = \\(Get-NetTCPConnection -LocalPort 3001 -State Listen -ErrorAction SilentlyContinue\\).OwningProcess | Select-Object -First 1; if \\($p\\) { Stop-Process -Id $p -Force; \"Killed PID $p\" } else { \"Port 3001 already free\" })",
+      "PowerShell(Set-Location \"d:\\\\ai\\\\nxturn\\\\src\"; \\(Get-Content pages\\\\ReceptionistPage.jsx -Raw\\) -replace 'text-brand-400', 'text-brand-700' -replace 'text-brand-300', 'text-brand-600' -replace 'text-slate-400\\(?!\"\\)', 'text-slate-600' -replace 'text-slate-300', 'text-slate-500' -replace 'text-white/60', 'text-white/80' -replace 'text-white/50', 'text-white/75' -replace 'text-white/70', 'text-white/85' | Set-Content pages\\\\ReceptionistPage.jsx -Encoding utf8)",
+      "PowerShell(Set-Location \"d:\\\\ai\\\\nxturn\\\\src\"; \\(Get-Content pages\\\\PatientStatusPage.jsx -Raw\\) -replace 'text-brand-400', 'text-brand-700' -replace 'text-brand-300', 'text-brand-600' -replace 'text-slate-400\\(?!\"\\)', 'text-slate-600' -replace 'text-white/60', 'text-white/85' -replace 'text-white/70', 'text-white/90' | Set-Content pages\\\\PatientStatusPage.jsx -Encoding utf8; \\(Get-Content pages\\\\DoctorPage.jsx -Raw\\) -replace 'text-brand-400', 'text-brand-700' -replace 'text-slate-400\\(?!\"\\)', 'text-slate-600' -replace 'text-white/60', 'text-white/85' -replace 'text-white/70', 'text-white/90' | Set-Content pages\\\\DoctorPage.jsx -Encoding utf8; \\(Get-Content pages\\\\LandingPage.jsx -Raw\\) -replace 'text-brand-400', 'text-brand-700' -replace 'text-slate-400\\(?!\"\\)', 'text-slate-600' -replace 'text-white/60', 'text-white/85' -replace 'text-white/70', 'text-white/90' | Set-Content pages\\\\LandingPage.jsx -Encoding utf8)",
+      "Bash(npm run *)",
+      "Bash(cd /mnt/d/ai/nxturn && npm run build 2>&1 | tail -4)",
+      "Read(//mnt/d/ai/**)",
+      "Bash(git add *)"
+    ]
+  }
+}
