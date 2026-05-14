@@ -113,14 +113,15 @@ app.post('/api/mark-seen', async (req, res) => {
       })
     }
 
-    // Get waiting queue
+    // Get next patients — include both 'waiting' and 'ready' (ready means notified but not yet in_progress)
     const todayIST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
     const { data: waiting } = await supabase
       .from('patients')
       .select('*')
       .eq('clinic_id', clinic_id)
       .eq('appointment_date', todayIST)
-      .eq('status', 'waiting')
+      .in('status', ['waiting', 'ready'])
+      .order('priority', { ascending: false })
       .order('token_number', { ascending: true })
 
     // Promote first waiting → in_progress
